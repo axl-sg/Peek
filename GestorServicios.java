@@ -54,7 +54,7 @@ public class GestorServicios {
                 // Validar conflictos de horario
                 if (tieneConflictoHorario(todosLosPerros, fecha, hora)) {
                     JOptionPane.showMessageDialog(null, 
-                        "❌ CONFLICTO DE HORARIO ❌\n\n" +
+                        "CONFLICTO DE HORARIO \n\n" +
                         "Ya existe un paseo programado a las " + hora + " durante el período solicitado.\n" +
                         "Por favor, seleccione una hora diferente.\n\n" +
                         "Horarios disponibles: cualquier hora entre 15:00 y 20:00 que no esté ocupada.",
@@ -70,7 +70,7 @@ public class GestorServicios {
                     " Servicios de paseo registrados exitosamente.\n\n" +
                     "Período: " + fecha + " al " + fecha.plusDays(6) + "\n" +
                     "Hora: " + hora + "\n" +
-                    "🐕 Perro: " + perro.getNombre());
+                    "Perro: " + perro.getNombre());
                     
             } catch (DateTimeParseException e) {
                 JOptionPane.showMessageDialog(null, "Formato de fecha u hora inválido.");
