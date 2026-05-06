@@ -1,6 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class VentanaPrincipal extends JFrame {
     private ArrayList<Perro> perros;
@@ -17,14 +19,25 @@ public class VentanaPrincipal extends JFrame {
 
         // Configuración de la ventana
         setTitle(" Gestión de Servicios para Perros - PEEK");
-        setSize(400, 400);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(550, 550);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLocationRelativeTo(null);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                manejadorArchivos.guardarPerros(perros);
+                JOptionPane.showMessageDialog(VentanaPrincipal.this, 
+                    "Datos guardados exitosamente.\nCerrando sistema...", 
+                    "Salir del Sistema", 
+                    JOptionPane.INFORMATION_MESSAGE);
+                System.exit(0);
+            }
+        });
         getContentPane().setBackground(new Color(47, 52, 73)); // Fondo azul
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
         // Agregar título descriptivo
-        JLabel titulo = new JLabel("<html><center>🐕 SISTEMA DE GESTIÓN<br>Control de Horarios Integrado</center></html>");
+        JLabel titulo = new JLabel("<html><center> SISTEMA DE GESTIÓN<br>Control de Horarios Integrado</center></html>");
         titulo.setForeground(Color.WHITE);
         titulo.setFont(new Font("Arial", Font.BOLD, 16));
         titulo.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -38,6 +51,7 @@ public class VentanaPrincipal extends JFrame {
         JButton btnRegistrarServicio = crearBoton("Registrar Servicio");
         JButton btnActualizarServicios = crearBoton("Actualizar Servicios");
         JButton btnConsultarServicios = crearBoton("Consultar Servicios");
+        JButton btnEliminarPerro = crearBoton("Eliminar Perro");
         JButton btnSalir = crearBoton("Salir");
 
         // Acciones
@@ -57,10 +71,27 @@ public class VentanaPrincipal extends JFrame {
             gestorServicios.consultarServicios(perros, registroPerros);
         });
 
+        btnEliminarPerro.addActionListener(e -> {
+            if (perros.size() == 0) {
+                JOptionPane.showMessageDialog(this, "No hay perros registrados.");
+                return;
+            }
+            Perro perro = registroPerros.seleccionarPerro(perros);
+            if (perro == null) return;
+            int confirm = JOptionPane.showConfirmDialog(this, 
+                "¿Está seguro de eliminar a " + perro.getNombre() + "?\nEsta acción no se puede deshacer.",
+                "Confirmar Eliminación", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                perros.remove(perro);
+                manejadorArchivos.guardarPerros(perros);
+                JOptionPane.showMessageDialog(this, "Perro eliminado exitosamente.");
+            }
+        });
+
         btnSalir.addActionListener(e -> {
             manejadorArchivos.guardarPerros(perros);
             JOptionPane.showMessageDialog(this, 
-                "✅ Datos guardados exitosamente.\nCerrando sistema...", 
+                "Datos guardados exitosamente.\nCerrando sistema...", 
                 "Salir del Sistema", 
                 JOptionPane.INFORMATION_MESSAGE);
             System.exit(0);
@@ -68,9 +99,14 @@ public class VentanaPrincipal extends JFrame {
 
         // Agregar botones centrados y con tamaño definido
         add(crearPanelBoton(btnRegistrarPerro));
+        add(Box.createVerticalStrut(10));
         add(crearPanelBoton(btnRegistrarServicio));
+        add(Box.createVerticalStrut(10));
         add(crearPanelBoton(btnActualizarServicios));
+        add(Box.createVerticalStrut(10));
         add(crearPanelBoton(btnConsultarServicios));
+        add(Box.createVerticalStrut(10));
+        add(crearPanelBoton(btnEliminarPerro));
         add(Box.createVerticalStrut(10));
         add(crearPanelBoton(btnSalir));
     }
@@ -82,7 +118,7 @@ public class VentanaPrincipal extends JFrame {
         boton.setForeground(Color.BLACK);              // Texto negro
         boton.setFocusPainted(false);
         boton.setFont(new Font("Arial", Font.BOLD, 13));
-        boton.setPreferredSize(new Dimension(250, 40)); // Tamaño original
+        boton.setPreferredSize(new Dimension(300, 45)); // Tamaño optimizado
         
         // Efecto hover mejorado
         boton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -127,7 +163,7 @@ public class VentanaPrincipal extends JFrame {
             loginPanel.add(passField, gbc);
             
             int result = JOptionPane.showConfirmDialog(null, loginPanel, 
-                "🔐 Acceso al Sistema - Control de Horarios", 
+                "Acceso al Sistema - Control de Horarios", 
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
             
             if (result == JOptionPane.OK_OPTION) {
@@ -136,14 +172,14 @@ public class VentanaPrincipal extends JFrame {
                 
                 if (user != null && pass != null && user.equals("PEEK") && pass.equals("adm")) {
                     JOptionPane.showMessageDialog(null, 
-                        "✅ Acceso autorizado\n🐕 Bienvenido a Peek", 
+                        " Acceso autorizado\nBienvenido a Peek", 
                         "Acceso Concedido", 
                         JOptionPane.INFORMATION_MESSAGE);
                     VentanaPrincipal ventana = new VentanaPrincipal();
                     ventana.setVisible(true);
                 } else {
                     JOptionPane.showMessageDialog(null, 
-                        "❌ Credenciales incorrectas\n🚫 Acceso denegado", 
+                        "Credenciales incorrectas\nAcceso denegado", 
                         "Error de Autenticación", 
                         JOptionPane.ERROR_MESSAGE);
                 }
